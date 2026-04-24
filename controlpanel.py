@@ -1,7 +1,12 @@
 import os, yaml
+from pathlib import Path
+
 import typer
 from dotenv import load_dotenv
-from system.helpers import load_or_create_agent_id, print_startup_banner
+from helpers import load_or_create_agent_id, print_startup_banner
+
+BASE_DIR = Path(__file__).resolve().parent
+config_path = BASE_DIR.parent / "config.yaml"
 
 load_dotenv()
 
@@ -9,7 +14,7 @@ app = typer.Typer()
 
 @app.command()
 def info():
-    with open("../config.yaml") as f:
+    with open(BASE_DIR.parent / "config.yaml") as f:
         config = yaml.safe_load(f)
     print_startup_banner(
         load_or_create_agent_id(config.get("agent", [{}])[0].get("nickname")),
