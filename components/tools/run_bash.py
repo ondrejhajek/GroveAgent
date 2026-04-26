@@ -2,6 +2,7 @@ import re
 import subprocess
 from pydantic_ai import RunContext, Tool
 from pydantic import BaseModel, Field
+from system.constants import STORAGE_DIR
 
 BLOCKED_PATTERNS = [
     r"rm\s+-rf?\s+/",
@@ -30,10 +31,9 @@ MAX_SCRIPT_LENGTH = 2000
 TIMEOUT_SECONDS = 30
 
 ALLOWED_DIRS = [
-    "/home/ondicz/Dev/prefect/storage",
+    STORAGE_DIR,
     "/tmp",
 ]
-
 
 class RunBashParams(BaseModel):
     script: str = Field(description="Bash příkaz nebo skript k vykonání")
@@ -78,7 +78,7 @@ def run_bash(ctx: RunContext, params: RunBashParams) -> RunBashResult:
             capture_output=True,
             text=True,
             timeout=TIMEOUT_SECONDS,
-            cwd="/home/ondicz/Dev/prefect/storage",
+            cwd=STORAGE_DIR,
         )
     except subprocess.TimeoutExpired:
         return RunBashResult(

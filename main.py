@@ -1,4 +1,5 @@
 import os, logfire, yaml
+from pathlib import Path
 from typing import Dict
 from pydantic_ai import ModelRequest, UserPromptPart
 from faststream import FastStream
@@ -9,32 +10,63 @@ from system import models
 from system.agent import create_agent, AgentConfig
 from system.observers import bootstrap_observers
 from system.helpers import load_or_create_agent_id, print_startup_banner
+from jinja2 import Template
 from dotenv import load_dotenv
 load_dotenv()
 
 logfire.configure()
 logfire.instrument_pydantic_ai()
+from system.constants import BASE_DIR, CONFIG_FILE, MEMORY_FILE, STORAGE_DIR
 
-with open('config.yaml', 'r') as f:
-    config_data = yaml.safe_load(f)
+with open(CONFIG_FILE) as f:
+    tpl = Template(f.read())
+
+rendered = tpl.render(
+    BASE_DIR=BASE_DIR,
+    MEMORY_FILE=MEMORY_FILE,
+    STORAGE_DIR=STORAGE_DIR
+)
+
+config_data = yaml.safe_load(rendered)
 
 agent_config = config_data.get("agent", [{}])[0]
 
 AGENT_ID = load_or_create_agent_id(agent_config.get("nickname"))
 
-rabbitmq_host = os.environ.get("RABBITMQ_HOST", "0.0.0.0")
+print_startup_banner(AGENT_ID, config_data, os.environ.get("RABBITMQ_HOST", ""), os.environ.get("RABBITMQ_USERNAME", ""))
 
-print_startup_banner(AGENT_ID, config_data, rabbitmq_host, os.environ.get("RABBITMQ_USERNAME", ""))
-
-broker = RabbitBroker(f"amqp://{os.environ['RABBITMQ_USERNAME']}:{os.environ['RABBITMQ_PASSWORD']}@0.0.0.0:5672/")
+broker = RabbitBroker(f"amqp://{os.environ['RABBITMQ_USERNAME']}:{os.environ['RABBITMQ_PASSWORD']}@{os.environ["RABBITMQ_HOST"]}/")
 
 faststream = FastStream(broker)
 
 exchange = RabbitExchange(AGENT_ID, durable=True, auto_delete=False, type=ExchangeType.TOPIC)
 
+observers = config_data.get('observers', {})
+
+# with open(file_path, "r", encoding="utf-8") as f:
+#     for line in f:
+#         line = line.strip()
+#         if not line:
+#             continue
+#         try:
+#             prompt, cron = line.split("@", 1)
+#         except ValueError:
+#             continue
+#         observers.append(
+#             {
+#                 "enabled": True,
+#                 "type": "cron",
+#                 "parameters": {
+#                     "interval": cron.strip()
+#                 },
+#                 "prompt": prompt.strip()
+#             }
+#         )
+
 @faststream.on_startup
 async def on_startup():
     await bootstrap_observers(config_data.get('observers', []), broker, exchange, AGENT_ID)
+    # await bootstrap_tasker(config_data.get('observers', []), broker, exchange, AGENT_ID)
 
 agent = create_agent(
     AgentConfig(
