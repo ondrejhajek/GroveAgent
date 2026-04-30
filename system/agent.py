@@ -82,7 +82,7 @@ def build_toolsets(mcp_servers, mcps, tools_agents, tools: List[str] = None) -> 
     if mcps:
         for name in mcps:
             try:
-                module = importlib.import_module(f"components.mcps.{name}")
+                module = importlib.import_module(f"agent.components.mcps.{name}")
             except ModuleNotFoundError:
                 module = importlib.import_module(f"system.components.mcps.{name}")
             toolsets.append(FastMCPToolset(module.mcp))
@@ -91,7 +91,7 @@ def build_toolsets(mcp_servers, mcps, tools_agents, tools: List[str] = None) -> 
         component_tools = []
         for name in tools:
             try:
-                module = importlib.import_module(f"components.tools.{name}")
+                module = importlib.import_module(f"agent.components.tools.{name}")
                 component_tools.append(module.tool)
             except ModuleNotFoundError:
                 module = importlib.import_module(f"system.components.tools.{name}")

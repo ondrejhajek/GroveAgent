@@ -71,9 +71,8 @@ def print_startup_banner(agent_id: str, configuration) -> None:
         obs_lines = "\n".join(f"[cyan]{t}[/cyan]  {d}" for t, d in active_observers)
         table.add_row("[bold]Observers[/bold]", obs_lines)
 
-    table.add_row("", "")
-
     if mcp_servers:
+        table.add_row("", "")
         table.add_row("[bold]MCP[/bold]", ", ".join(mcp_servers))
 
     table.add_row("", "")
