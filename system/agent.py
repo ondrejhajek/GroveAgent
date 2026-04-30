@@ -53,7 +53,7 @@ def create_agent(config_file) -> Agent:
     agent_config = AgentConfig(
         name=agent_config.get("name"),
         model_name=agent_config.get("model"),
-        tools_agents=config_data.get("tools_agents", []),
+        tools_agents=agent_config.get("tools_agents", []),
         mcpServers=agent_config.get("mcpServers"),
         mcp=agent_config.get("mcp"),
         instructions=prepend_prompt.replace('{{MEMORY_FILE}}', str(MEMORY_FILE)) + agent_config.get("instructions", ""),

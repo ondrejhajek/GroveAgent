@@ -44,7 +44,13 @@ def print_startup_banner(agent_id: str, configuration) -> None:
 
     agent_cfg = configuration.get("agent")
 
-    tools = [t["name"] for t in configuration.get("tools_agents", []) if t.get("enabled")]
+    tools_agents = [
+        (t.get("name", ""), t.get("model", ""), t.get("tool_description", ""), t.get("instructions", ""))
+        for t in (agent_cfg.get("tools_agents") or [])
+        if t.get("enabled")
+    ]
+
+    tools = list(agent_cfg.get("tools") or [])
 
     active_observers = []
     for item in configuration.get("observers", []):
@@ -53,7 +59,7 @@ def print_startup_banner(agent_id: str, configuration) -> None:
             detail = next(iter(params.values()), "") if params else ""
             active_observers.append((item.get("type"), str(detail)))
 
-    mcp_servers = list((agent_cfg.get("mcpServers") or {}).get("mcpServers", {}).keys())
+    mcp_servers = list((agent_cfg.get("mcpServers") or {}).keys())
 
     table = Table(box=box.SIMPLE, show_header=False, padding=(0, 1))
     table.add_column(style="bold cyan", no_wrap=True)
@@ -64,7 +70,15 @@ def print_startup_banner(agent_id: str, configuration) -> None:
 
     if tools:
         table.add_row("", "")
-        table.add_row("[bold]Aktivní Tools agenti[/bold]", ", ".join(tools))
+        table.add_row("[bold]Tools[/bold]", ", ".join(tools))
+
+    if tools_agents:
+        table.add_row("", "")
+        agent_lines = "\n".join(
+            f"[cyan]{name}[/cyan]  [dim]{model}[/dim]\npopis: [italic]{description}[/italic] | instrukce: [italic]{instructions}[/italic]"
+            for name, model, description, instructions in tools_agents
+        )
+        table.add_row("[bold]Tools agenti[/bold]", agent_lines)
 
     if active_observers:
         table.add_row("", "")

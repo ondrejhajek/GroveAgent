@@ -23,6 +23,12 @@ agent:
           - "/home/ondicz/Nextcloud/ObsidianDataNextcloud/INBOX"
   tools: ["mailgun_mailer", "run_bash"]
   mcp: ['tasks'] #pouze ukázka definice, mcp server "tasks" je spouštěný automaticky
+  tools_agents:
+    - name: "GreetingsTextsDesigner"
+      enabled: true
+      tool_description: "návrh textů na narozeninových přání"
+      instructions: "Jsi geniální vynálezce narozeninových textových přání"
+      model: "mistralai/ministral-3b-2512"
 observers:
     - enabled: true
       type: dirwatch
