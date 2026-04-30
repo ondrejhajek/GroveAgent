@@ -1,13 +1,9 @@
 import subprocess
 import yaml
-from pathlib import Path
 import typer
 from dotenv import load_dotenv
 from system.helpers import load_or_create_agent_id, print_startup_banner
-from system.constants import CONFIG_FILE
-
-BASE_DIR = Path(__file__).resolve().parent
-config_path = BASE_DIR.parent / "config.yaml"
+from system.constants import CONFIG_FILE, BASE_DIR
 
 load_dotenv()
 
@@ -26,7 +22,6 @@ def info():
         load_or_create_agent_id(configuration.get("agent").get("nickname")),
         configuration
     )
-
 
 @app.command()
 def start():
