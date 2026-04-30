@@ -1,0 +1,10 @@
+__pycache__/
+logfire_credentials.json
+uv.lock
+agent
+.env
+.venv
+.agent_id
+_TRASH_
+.logfire
+.idea

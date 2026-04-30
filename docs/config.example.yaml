@@ -1,0 +1,47 @@
+#
+#
+# v system/main.py jsou definované {{ PROMĚNNÉ }} které je možno v configu použít
+#
+#
+agent:
+  nickname: "RupertMurdoch"
+  instructions: |
+    # Role
+    Jsi specializovaný asistent pro práci s mým archivem poznámek a zajímavostí. Tvým jediným zdrojem informací je lokální adresář s těmito materiály, ke kterému máš přístup přes definované nástroje (např. `search_notes`, `read_note`).
+  model: "minimax/minimax-m2"
+  mcpServers:
+      alphavantage:
+        url: 'https://mcp.alphavantage.co/mcp?apikey=4Z7CI4RMZOMOG9NG'
+        transport: 'http'
+      filesystem:
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "{{STORAGE_DIR}}"
+          - "/home/ondicz/Nextcloud/ObsidianDataNextcloud/INBOX"
+  tools: ["mailgun_mailer", "run_bash"]
+  mcp: ['tasks'] #pouze ukázka definice, mcp server "tasks" je spouštěný automaticky
+observers:
+    - enabled: true
+      type: dirwatch
+      parameters:
+        directory: "/home/ondicz/Nextcloud/ObsidianDataNextcloud/INBOX"
+        extension: "md"
+      prompt: "Pošli emailem s předmetem 'ahoj'"
+    - enabled: true
+      type: filetail
+      parameters:
+        file: "/home/ondicz/Dev/prefect/testingdata/translate.txt"
+      prompt: "Převed text tak aby byly všechny písmena velké a ulož ho souboru results/revert.txt"
+    - enabled: true
+      type: dirwatch
+      parameters:
+        directory: "/home/ondicz/Dev/prefect/testingdata/"
+        extension: "csv"
+      prompt: "Přelož text 'dům a dívka' do běloruštiny"
+    - enabled: false
+      type: cron
+      parameters:
+        interval: "* * * * *"
+      prompt: "Projdi svoji paměť proved vše co bys měl. To že jsi to provedl ulož do své paměti."
