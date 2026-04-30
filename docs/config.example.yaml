@@ -4,7 +4,8 @@
 #
 #
 agent:
-  nickname: "RupertMurdoch"
+  nickname: "ExampleAgent"
+  rewrite_buildin_prompt_to: "" #pokud nebude definované prompt nebude přepsany, pokud bude nastaveno "" tak nebude prompt žádný
   instructions: |
     # Role
     Jsi specializovaný asistent pro práci s mým archivem poznámek a zajímavostí. Tvým jediným zdrojem informací je lokální adresář s těmito materiály, ke kterému máš přístup přes definované nástroje (např. `search_notes`, `read_note`).

@@ -77,7 +77,8 @@ def print_startup_banner(agent_id: str, configuration) -> None:
 
     table.add_row("", "")
     table.add_row("RabbitMQ exchange", f"{agent_id}")
-    table.add_row("RabbitMQ", f"[link]http://{os.environ.get("RABBITMQ_HOST", "")}[/link]  (user: {os.environ.get("RABBITMQ_USERNAME", "")})")
+    table.add_row("RabbitMQ", f"{os.environ.get("RABBITMQ_HOST", "")}:{os.environ.get("RABBITMQ_PORT", "")}  (user: {os.environ.get("RABBITMQ_USERNAME", "")})")
+    table.add_row("RabbitMQ dashboard", f"[link]http://{os.environ.get("RABBITMQ_HOST", "")}:15672[/link]")
 
     table.add_row("", "")
     constantz = {k: v for k, v in vars(constants).items() if k.isupper()}

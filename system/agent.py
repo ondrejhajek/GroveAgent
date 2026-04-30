@@ -45,13 +45,18 @@ def create_agent(config_file) -> Agent:
 
     agent_config = config_data.get("agent")
 
+    prepend_prompt = agent_config.get("rewrite_buildin_prompt_to")
+
+    if prepend_prompt is None:
+        prepend_prompt = AGENT_BUILTIN_PROMPT
+
     agent_config = AgentConfig(
         name=agent_config.get("name"),
         model_name=agent_config.get("model"),
         tools_agents=config_data.get("tools_agents", []),
         mcpServers=agent_config.get("mcpServers"),
         mcp=agent_config.get("mcp"),
-        instructions=AGENT_BUILTIN_PROMPT.replace('{{MEMORY_FILE}}', str(MEMORY_FILE)) + agent_config.get("instructions", ""),
+        instructions=prepend_prompt.replace('{{MEMORY_FILE}}', str(MEMORY_FILE)) + agent_config.get("instructions", ""),
         tools=agent_config.get("tools", [])
     )
 
